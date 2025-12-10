@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role = Role.STUDENT;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(unique = true, nullable = false, length = 40)
     private String email;
 
     @Column(nullable = false)
