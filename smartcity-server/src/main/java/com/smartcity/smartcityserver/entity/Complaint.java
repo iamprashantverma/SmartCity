@@ -42,4 +42,13 @@ public class Complaint {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist(){
+        if(createdAt ==null)
+            createdAt = LocalDateTime.now();
+        if(updatedAt == null)
+            updatedAt = LocalDateTime.now();
+    }
+
 }

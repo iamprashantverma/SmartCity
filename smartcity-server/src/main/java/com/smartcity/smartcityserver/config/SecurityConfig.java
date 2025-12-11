@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(publicUrls).permitAll()
                         .requestMatchers("/teacher/**").hasRole("ADMIN")
-                        .requestMatchers("/student/**").hasRole("STUDENT")
+                        .requestMatchers("/citizen/**").hasRole("CITIZEN")
                         .anyRequest().authenticated()
                 )
                 .build();
