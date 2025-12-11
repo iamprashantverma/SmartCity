@@ -3,8 +3,8 @@ package com.smartcity.smartcityserver.service.impl;
 
 import com.smartcity.smartcityserver.dto.LoginRequestDTO;
 import com.smartcity.smartcityserver.dto.LoginResponseDTO;
-import com.smartcity.smartcityserver.dto.UserCreateDTO;
-import com.smartcity.smartcityserver.dto.UserResponseDTO;
+
+import com.smartcity.smartcityserver.dto.UserDTO;
 import com.smartcity.smartcityserver.entity.User;
 import com.smartcity.smartcityserver.exception.InvalidCredentialsException;
 import com.smartcity.smartcityserver.exception.UserAlreadyExistsException;
@@ -32,14 +32,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserResponseDTO signUp(UserCreateDTO studentCreateDTO) {
+    public UserDTO signUp(UserDTO studentCreateDTO) {
         // Check if user already exists
         userRepository.findByEmail(studentCreateDTO.getEmail())
                 .ifPresent(u -> {
                     log.warn("Signup failed: email {} already exists", studentCreateDTO.getEmail());
                     throw new UserAlreadyExistsException("Email already registered: " + studentCreateDTO.getEmail());
                 });
-        User toBeCreated = convertToEntity(studentCreateDTO);
+        User toBeCreated = convertToUserEntity(studentCreateDTO);
 
         // hash the plain text and store in the DB
         String hashPassword =  passwordEncoder.encode(toBeCreated.getPassword());
@@ -72,12 +72,12 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
-    private User convertToEntity(UserCreateDTO studentCreateDTO) {
-        return  modelMapper.map(studentCreateDTO,User.class);
+    private User convertToUserEntity(UserDTO userDTO) {
+        return  modelMapper.map(userDTO,User.class);
     }
 
-    private UserResponseDTO convertToUserDTO(User user) {
-        return modelMapper.map(user, UserResponseDTO.class);
+    private UserDTO convertToUserDTO(User user) {
+        return modelMapper.map(user, UserDTO.class);
     }
 
 }

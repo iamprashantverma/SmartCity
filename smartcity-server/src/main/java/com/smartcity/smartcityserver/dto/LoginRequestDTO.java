@@ -1,11 +1,16 @@
 package com.smartcity.smartcityserver.dto;
 
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class LoginRequestDTO {
-    private String email;
-    private String password;
 
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please enter a valid email")
+    private String email;
+
+    @NotBlank(message = "Password is required")
+    private String password;
 }

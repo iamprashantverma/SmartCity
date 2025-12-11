@@ -2,8 +2,7 @@ package com.smartcity.smartcityserver.controller;
 
 import com.smartcity.smartcityserver.dto.LoginRequestDTO;
 import com.smartcity.smartcityserver.dto.LoginResponseDTO;
-import com.smartcity.smartcityserver.dto.UserCreateDTO;
-import com.smartcity.smartcityserver.dto.UserResponseDTO;
+import com.smartcity.smartcityserver.dto.UserDTO;
 import com.smartcity.smartcityserver.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +28,11 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> singUp(@Valid @RequestBody UserCreateDTO studentCreateDTO) {
-        UserResponseDTO userCreated = authService.signUp(studentCreateDTO);
+    public ResponseEntity<UserDTO> singUp(@Valid @RequestBody UserDTO studentCreateDTO) {
+        UserDTO userCreated = authService.signUp(studentCreateDTO);
 
         return new ResponseEntity<>(userCreated, HttpStatus.CREATED);
     }
-
-
 
 
 }
