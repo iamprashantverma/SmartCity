@@ -1,108 +1,71 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/useAuth';
-import { getMyProfile } from '../../service/api/citizenService';
-import { FaUser, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
+import { useTheme } from '../../context/useTheme';
+import { getMyProfile, verifyEmailAddress } from '../../service/api/citizenService';
+import { FaEnvelope, FaUser, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const Profile = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: '',
-    email: '',
-    phoneNumber: '',
-    profilePictureUrl: ''
-  });
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
+  const [actionMessage, setActionMessage] = useState('');
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (user?.id) {
+      fetchProfile();
+    }
+  }, [user?.id]);
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
       const response = await getMyProfile(user?.id);
-      const profileData = response.data.data || {};
-      console.log(profileData);
+      const profileData = response.data?.data || {};
       setProfile(profileData);
-      setEditForm({
-        name: profileData.name || user?.name || '',
-        email: profileData.email || user?.email || '',
-        phoneNumber: profileData.phoneNumber || '',
-        profilePictureUrl: profileData.profilePictureUrl || ''
-      });
     } catch (error) {
       console.error('Error fetching profile:', error);
-      // Use user data as fallback
+      // fallback to auth context data
       setProfile({
         name: user?.name || '',
         email: user?.email || '',
         phoneNumber: '',
-        profilePictureUrl: ''
-      });
-      setEditForm({
-        name: user?.name || '',
-        email: user?.email || '',
-        phoneNumber: '',
-        profilePictureUrl: ''
+        profilePictureUrl: '',
+        emailVerified: user?.emailVerified || false,
+        active: user?.active ?? true,
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSave = async () => {
+  const handleVerifyEmail = async () => {
+    if (!user?.id) return;
     try {
-      // This would be an API call to update profile
-      // For now, we'll update locally
-      setProfile(editForm);
-      setEditing(false);
-      toast.success('Profile updated successfully!');
+      setVerifyingEmail(true);
+      const response = await verifyEmailAddress(user.id);
+      const updatedProfile = response?.data?.data;
+      const message =
+        response?.data?.message || 'Verification email sent! Please check your inbox.';
+
+      setProfile((prev) => ({
+        ...prev,
+        ...(updatedProfile || {}),
+        emailVerified: updatedProfile?.emailVerified ?? true,
+      }));
+      setActionMessage(message);
+      toast.success(message);
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      console.error('Error sending verification email:', error);
+      const message =
+        error?.response?.data?.message || 'Failed to send verification email';
+      setActionMessage(message);
+      toast.error(message);
+    } finally {
+      setVerifyingEmail(false);
     }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    let newValue = value;
-    
-    // Phone number validation - only digits and + allowed, max 13 chars
-    if (name === 'phoneNumber') {
-      newValue = value.replace(/[^0-9+]/g, '');
-      if (newValue.length > 13) {
-        newValue = newValue.slice(0, 13);
-      }
-    }
-    
-    // Name validation - max 50 chars
-    if (name === 'name' && value.length > 50) {
-      newValue = value.slice(0, 50);
-    }
-    
-    // Profile picture URL validation - max 255 chars
-    if (name === 'profilePictureUrl' && value.length > 255) {
-      newValue = value.slice(0, 255);
-    }
-    
-    setEditForm(prev => ({
-      ...prev,
-      [name]: newValue
-    }));
-  };
-
-  const handleCancel = () => {
-    setEditForm({
-      name: profile?.name || '',
-      email: profile?.email || '',
-      phoneNumber: profile?.phoneNumber || '',
-      profilePictureUrl: profile?.profilePictureUrl || ''
-    });
-    setEditing(false);
   };
 
   if (loading) {
@@ -114,45 +77,31 @@ const Profile = () => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div
+      className={`rounded-2xl shadow-lg p-6 space-y-6 ${
+        theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+      }`}
+    >
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <FaUser className="text-2xl text-green-600" />
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">My Profile</h2>
-        </div>
-        
-        {!editing ? (
-          <button
-            onClick={() => setEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <FaEdit />
-            Edit Profile
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <FaSave />
-              Save
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-            >
-              <FaTimes />
-              Cancel
-            </button>
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {user?.role === 'ADMIN' ? 'Admin Profile' : 'Citizen Profile'}
+            </p>
+            <h2 className="text-2xl font-bold">My Profile</h2>
           </div>
+        </div>
+        {actionMessage && (
+          <span className="text-xs px-3 py-2 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200">
+            {actionMessage}
+          </span>
         )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Picture Section */}
         <div className="lg:col-span-1">
-          <div className="text-center">
+          <div className="text-center p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 shadow-sm">
             {profile?.profilePictureUrl ? (
               <img
                 src={profile.profilePictureUrl}
@@ -164,139 +113,110 @@ const Profile = () => {
                 }}
               />
             ) : null}
-            <div className={`w-32 h-32 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 ${profile?.profilePictureUrl ? 'hidden' : ''}`}>
+            <div
+              className={`w-32 h-32 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                profile?.profilePictureUrl ? 'hidden' : ''
+              }`}
+            >
               <FaUser className="text-4xl text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">{profile?.name || 'User'}</h3>
-            <p className="text-gray-600 dark:text-gray-300">{user?.role || 'Citizen'}</p>
+            <h3 className="text-xl font-bold">{profile?.name || 'User'}</h3>
+            <p className="text-gray-500 dark:text-gray-400">{user?.role || 'Citizen'}</p>
+
             <div className="mt-4 space-y-2">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-sm text-green-700">
-                  <strong>Account Status:</strong><br />
-                  {profile?.active ? 'Active' : 'Inactive'}
+              <div
+                className={`p-3 rounded-lg ${
+                  theme === 'dark' ? 'bg-green-900/20 border border-green-800' : 'bg-green-50'
+                }`}
+              >
+                <p
+                  className={`text-sm ${
+                    theme === 'dark' ? 'text-green-300' : 'text-green-700'
+                  }`}
+                >
+                  <strong>Account Status:</strong> {profile?.active ? 'Active' : 'Inactive'}
                 </p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  <strong>Email Status:</strong><br />
+
+              <div
+                className={`p-3 rounded-lg ${
+                  profile?.emailVerified
+                    ? theme === 'dark'
+                      ? 'bg-blue-900/20 border border-blue-800'
+                      : 'bg-blue-50'
+                    : theme === 'dark'
+                      ? 'bg-red-900/20 border border-red-800'
+                      : 'bg-red-50'
+                }`}
+              >
+                <p
+                  className={`text-sm ${
+                    profile?.emailVerified
+                      ? theme === 'dark'
+                        ? 'text-blue-300'
+                        : 'text-blue-700'
+                      : theme === 'dark'
+                        ? 'text-red-300'
+                        : 'text-red-700'
+                  }`}
+                >
+                  <strong>Email Status:</strong>{' '}
                   {profile?.emailVerified ? 'Verified' : 'Not Verified'}
                 </p>
+
+                {!profile?.emailVerified && (
+                  <div className="mt-3">
+                    <button
+                      onClick={handleVerifyEmail}
+                      disabled={verifyingEmail}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm w-full justify-center"
+                    >
+                      {verifyingEmail ? (
+                        <>
+                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <FaEnvelope />
+                          Verify Email
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Profile Information */}
         <div className="lg:col-span-2">
           <div className="space-y-6">
-            {/* Personal Information */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Personal Information</h4>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
-                  </label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      name="name"
-                      value={editForm.name}
-                      onChange={handleInputChange}
-                      placeholder="Enter your full name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      required
-                      minLength={2}
-                      maxLength={50}
-                    />
+            <div
+              className={`grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl border ${
+                theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+              } shadow-sm`}
+            >
+              <InfoField label="Full Name" value={profile?.name || 'Not provided'} />
+              <InfoField
+                label="Email Address"
+                value={profile?.email || 'Not provided'}
+                extra={
+                  profile?.emailVerified ? (
+                    <Badge icon={FaCheckCircle} color="text-green-600" text="Verified" />
                   ) : (
-                    <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{profile?.name || 'Not provided'}</p>
-                  )}
-                  {editing && (
-                    <p className="text-xs text-gray-500 mt-1">{editForm.name.length}/50 characters</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
-                  </label>
-                  {editing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={editForm.email}
-                      onChange={handleInputChange}
-                      placeholder="your@email.com"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      required
-                    />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg flex-1">{profile?.email || 'Not provided'}</p>
-                      {profile?.emailVerified && (
-                        <span className="text-green-600 text-sm font-medium">✓ Verified</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone Number
-                  </label>
-                  {editing ? (
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      value={editForm.phoneNumber}
-                      onChange={handleInputChange}
-                      placeholder="+91 9876543210"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      maxLength={13}
-                    />
-                  ) : (
-                    <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{profile?.phoneNumber || 'Not provided'}</p>
-                  )}
-                  {editing && (
-                    <p className="text-xs text-gray-500 mt-1">Maximum 13 characters including country code</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile Picture URL
-                  </label>
-                  {editing ? (
-                    <input
-                      type="url"
-                      name="profilePictureUrl"
-                      value={editForm.profilePictureUrl}
-                      onChange={handleInputChange}
-                      placeholder="https://example.com/profile.jpg"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                      maxLength={255}
-                    />
-                  ) : (
-                    <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg break-all">
-                      {profile?.profilePictureUrl || 'Not provided'}
-                    </p>
-                  )}
-                  {editing && (
-                    <p className="text-xs text-gray-500 mt-1">{editForm.profilePictureUrl.length}/255 characters</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">User ID</label>
-                  <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{user?.id || 'N/A'}</p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                  <p className="text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">{user?.role || 'N/A'}</p>
-                </div>
-              </div>
+                    <Badge icon={FaExclamationTriangle} color="text-red-600" text="Not verified" />
+                  )
+                }
+              />
+              <InfoField label="Phone Number" value={profile?.phoneNumber || 'Not provided'} />
+              <InfoField
+                label="Profile Picture URL"
+                value={profile?.profilePictureUrl || 'Not provided'}
+                isLong
+              />
+              <InfoField label="User ID" value={user?.id || 'N/A'} />
+              <InfoField label="Role" value={user?.role || 'N/A'} />
             </div>
           </div>
         </div>
@@ -304,5 +224,28 @@ const Profile = () => {
     </div>
   );
 };
+
+const InfoField = ({ label, value, extra, isLong = false }) => (
+  <div className="space-y-1">
+    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">{label}</label>
+    <div className="flex items-start gap-2">
+      <p
+        className={`px-3 py-2 rounded-lg ${
+          isLong ? 'break-all' : ''
+        } bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 flex-1 shadow-inner dark:shadow-none border border-gray-100 dark:border-gray-700`}
+      >
+        {value}
+      </p>
+      {extra}
+    </div>
+  </div>
+);
+
+const Badge = ({ icon: Icon, color, text }) => (
+  <span className={`inline-flex items-center gap-1 text-xs font-semibold ${color}`}>
+    <Icon />
+    {text}
+  </span>
+);
 
 export default Profile;

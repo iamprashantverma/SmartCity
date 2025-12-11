@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTheme } from '../../context/useTheme';
 import { FaCreditCard, FaReceipt, FaCheckCircle } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const BillPayment = () => {
+  const { theme } = useTheme();
   const [selectedBill, setSelectedBill] = useState(null);
   const [paymentForm, setPaymentForm] = useState({
     cardNumber: '',
@@ -130,10 +132,16 @@ const BillPayment = () => {
 
   if (paymentSuccess) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+      <div className={`rounded-xl shadow-lg p-8 text-center ${
+        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
         <FaCheckCircle className="mx-auto text-6xl text-green-600 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Payment Successful!</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
+        <h2 className={`text-2xl font-bold mb-2 ${
+          theme === 'dark' ? 'text-white' : 'text-gray-800'
+        }`}>Payment Successful!</h2>
+        <p className={`mb-4 ${
+          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+        }`}>
           Your payment of ₹{selectedBill?.amount.toFixed(2)} for {selectedBill?.type} has been processed.
         </p>
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
@@ -144,7 +152,9 @@ const BillPayment = () => {
             <strong>Bill Number:</strong> {selectedBill?.billNumber}
           </p>
         </div>
-        <p className="text-sm text-gray-500">Redirecting to bills overview...</p>
+        <p className={`text-sm ${
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+        }`}>Redirecting to bills overview...</p>
       </div>
     );
   }
@@ -153,10 +163,14 @@ const BillPayment = () => {
     <div className="space-y-6">
       {!selectedBill ? (
         // Bills Overview
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className={`rounded-xl shadow-lg p-6 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <div className="flex items-center gap-3 mb-6">
             <FaReceipt className="text-2xl text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-800">Utility Bills</h2>
+            <h2 className={`text-2xl font-bold ${
+              theme === 'dark' ? 'text-white' : 'text-gray-800'
+            }`}>Utility Bills</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

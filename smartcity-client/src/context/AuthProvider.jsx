@@ -4,10 +4,10 @@ import { AuthContext } from "./AuthContext";
 import { login as loginAPI } from "../service/api/authService";
 
 const AuthProvider = ({ children }) => {
-  
   const [accessToken, setAccessToken] = useState(null);
   const [refreshToken, setRefreshToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   const setAuthData = (access, refresh) => {
     setAccessToken(access);
@@ -36,7 +36,7 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-      const initializeAuth = () => {
+    const initializeAuth = () => {
       const storedAccessToken = localStorage.getItem("accessToken");
       const storedRefreshToken = localStorage.getItem("refreshToken");
 
@@ -48,8 +48,9 @@ const AuthProvider = ({ children }) => {
           clearAuthData();
         }
       }
+      setIsInitializing(false);
     };
-    initializeAuth(); 
+    initializeAuth();
   }, []);
 
   const login = async (form) => {
@@ -69,7 +70,7 @@ const AuthProvider = ({ children }) => {
   const logout = () => clearAuthData();
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, refreshToken, login, logout }}>
+    <AuthContext.Provider value={{ user, accessToken, refreshToken, login, logout, isInitializing }}>
       {children}
     </AuthContext.Provider>
   );

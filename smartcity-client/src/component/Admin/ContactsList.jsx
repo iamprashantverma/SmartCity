@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { getAllContacts } from '../../service/api/adminService';
+import { useTheme } from '../../context/useTheme';
 import { FaEye, FaEnvelope, FaUser, FaCalendar } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const ContactsList = ({ onUpdate }) => {
+  const { theme } = useTheme();
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState(null);

@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useTheme } from "../context/useTheme";
 import { FaCity, FaExclamationTriangle, FaCreditCard, FaEnvelope, FaUsers, FaArrowRight } from "react-icons/fa";
 
 const Home = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
 
   const features = [
     {
@@ -34,7 +36,11 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className={`min-h-screen ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-to-br from-blue-50 via-white to-green-50'
+    }`}>
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
@@ -43,10 +49,14 @@ const Home = () => {
               <FaCity className="text-white text-3xl" />
             </div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-white mb-6">
+          <h1 className={`text-5xl md:text-6xl font-bold mb-6 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
             Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-green-600">Smart City</span>
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          <p className={`text-xl mb-8 max-w-3xl mx-auto ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             Your digital gateway to city services. File complaints, pay bills, and stay connected with your local administration - all in one place.
           </p>
           
@@ -61,7 +71,11 @@ const Home = () => {
               </Link>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-white font-semibold rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                className={`inline-flex items-center gap-2 px-8 py-4 font-semibold rounded-xl border-2 transition-all duration-200 transform hover:scale-105 shadow-lg ${
+                  theme === 'dark' 
+                    ? 'bg-gray-800 text-white border-gray-600 hover:border-blue-400 hover:text-blue-400'
+                    : 'bg-white text-gray-800 border-gray-300 hover:border-blue-500 hover:text-blue-600'
+                }`}
               >
                 Sign In
               </Link>
@@ -80,59 +94,77 @@ const Home = () => {
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+            <div key={index} className={`rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border ${
+              theme === 'dark' 
+                ? 'bg-gray-800 border-gray-700' 
+                : 'bg-white border-gray-100'
+            }`}>
               <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-4`}>
                 <feature.icon className="text-xl" />
               </div>
-              <h3 className="text-xl font-bold text-gray-800 mb-3">{feature.title}</h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <h3 className={`text-xl font-bold mb-3 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>{feature.title}</h3>
+              <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>{feature.description}</p>
             </div>
           ))}
         </div>
 
         {/* Stats Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Making Cities Smarter</h2>
+        <div className={`rounded-2xl shadow-xl p-8 mb-16 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <h2 className={`text-3xl font-bold text-center mb-8 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>Making Cities Smarter</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="text-4xl font-bold text-blue-600 mb-2">1000+</div>
-              <div className="text-gray-600">Complaints Resolved</div>
+              <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Complaints Resolved</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-green-600 mb-2">5000+</div>
-              <div className="text-gray-600">Bills Paid Online</div>
+              <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Bills Paid Online</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-bold text-purple-600 mb-2">24/7</div>
-              <div className="text-gray-600">Support Available</div>
+              <div className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Support Available</div>
             </div>
           </div>
         </div>
 
         {/* How It Works */}
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-800 mb-12">How It Works</h2>
+          <h2 className={`text-3xl font-bold mb-12 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="relative">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">1</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sign Up</h3>
-              <p className="text-gray-600">Create your account and verify your identity</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Sign Up</h3>
+              <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Create your account and verify your identity</p>
             </div>
             <div className="relative">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Access Services</h3>
-              <p className="text-gray-600">File complaints, pay bills, or contact support</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Access Services</h3>
+              <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>File complaints, pay bills, or contact support</p>
             </div>
             <div className="relative">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Track Progress</h3>
-              <p className="text-gray-600">Monitor status and receive updates on your requests</p>
+              <h3 className={`text-xl font-semibold mb-2 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Track Progress</h3>
+              <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Monitor status and receive updates on your requests</p>
             </div>
           </div>
         </div>

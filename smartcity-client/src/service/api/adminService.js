@@ -12,6 +12,13 @@ export const getComplaintById = (id) => {
   return api.get(`/admin/complaints/${id}`);
 };
 
+
+export const changeComplaintStatus = (data, id) => {
+  return api.patch(`/admin/complaint/${id}`, data);
+};
+
+
+
 // ==================== CONTACTS ==================== //
 
 // Get all contacts

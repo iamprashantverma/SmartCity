@@ -17,7 +17,15 @@ import { useAuth } from './context/useAuth';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
-  const { user } = useAuth();
+  const { user, isInitializing } = useAuth();
+  
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -77,6 +85,15 @@ function App() {
             <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
               <div className="container mx-auto px-4 py-8">
                 <ContactsList />
+              </div>
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path='/admin/profile' element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+              <div className="container mx-auto px-4 py-8">
+                <Profile />
               </div>
             </div>
           </ProtectedRoute>

@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
+import { useTheme } from '../../context/useTheme';
 import { getComplaints, getMyProfile } from '../../service/api/citizenService';
 import { FaUser, FaExclamationTriangle, FaEnvelope, FaCreditCard, FaPlus } from 'react-icons/fa';
 
 const CitizenDashboard = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalComplaints: 0,
@@ -33,11 +35,17 @@ const CitizenDashboard = () => {
   };
 
   const StatCard = ({ icon: Icon, title, value, color, bgColor }) => (
-    <div className={`${bgColor} dark:bg-gray-800 rounded-xl p-6 shadow-lg border-l-4 ${color}`}>
+    <div className={`rounded-xl p-6 shadow-lg border-l-4 ${color} ${
+      theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+    }`}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-gray-600 dark:text-gray-300 text-sm font-medium">{title}</p>
-          <p className="text-3xl font-bold text-gray-800 dark:text-white mt-2">{value}</p>
+          <p className={`text-sm font-medium ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>{title}</p>
+          <p className={`text-3xl font-bold mt-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>{value}</p>
         </div>
         <div className={`p-3 rounded-full ${color.replace('border-l-', 'bg-').replace('-500', '-100')}`}>
           <Icon className={`text-2xl ${color.replace('border-l-', 'text-')}`} />
@@ -47,14 +55,22 @@ const CitizenDashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
+    <div className={`min-h-screen ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+        : 'bg-gradient-to-br from-green-50 to-blue-100'
+    }`}>
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+          <h1 className={`text-4xl font-bold mb-2 ${
+            theme === 'dark' ? 'text-white' : 'text-gray-800'
+          }`}>
             Welcome, {user?.name}!
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">Citizen Portal - Smart City Services</p>
+          <p className={`text-lg ${
+            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+          }`}>Citizen Portal - Smart City Services</p>
         </div>
 
 
@@ -88,27 +104,47 @@ const CitizenDashboard = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Quick Actions</h3>
+            <div className={`rounded-xl shadow-lg p-6 ${
+              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <h3 className={`text-xl font-bold mb-4 ${
+                theme === 'dark' ? 'text-white' : 'text-gray-800'
+              }`}>Quick Actions</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Link
                   to="/citizen/complaints/create"
-                  className="flex items-center gap-3 p-4 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-colors"
+                  className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
+                    theme === 'dark' 
+                      ? 'bg-red-900/20 hover:bg-red-900/30 border-red-800' 
+                      : 'bg-red-50 hover:bg-red-100 border-red-200'
+                  }`}
                 >
                   <FaPlus className="text-red-600 text-xl" />
                   <div className="text-left">
-                    <p className="font-semibold text-red-800">File New Complaint</p>
-                    <p className="text-sm text-red-600">Report a city issue quickly</p>
+                    <p className={`font-semibold ${
+                      theme === 'dark' ? 'text-red-300' : 'text-red-800'
+                    }`}>File New Complaint</p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-red-400' : 'text-red-600'
+                    }`}>Report a city issue quickly</p>
                   </div>
                 </Link>
                 <Link
                   to="/citizen/profile"
-                  className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition-colors"
+                  className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
+                    theme === 'dark' 
+                      ? 'bg-blue-900/20 hover:bg-blue-900/30 border-blue-800' 
+                      : 'bg-blue-50 hover:bg-blue-100 border-blue-200'
+                  }`}
                 >
                   <FaUser className="text-blue-600 text-xl" />
                   <div className="text-left">
-                    <p className="font-semibold text-blue-800">Update Profile</p>
-                    <p className="text-sm text-blue-600">Manage your information</p>
+                    <p className={`font-semibold ${
+                      theme === 'dark' ? 'text-blue-300' : 'text-blue-800'
+                    }`}>Update Profile</p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                    }`}>Manage your information</p>
                   </div>
                 </Link>
               </div>

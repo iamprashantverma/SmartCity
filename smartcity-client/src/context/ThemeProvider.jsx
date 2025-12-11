@@ -13,19 +13,19 @@ const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    if (theme === 'dark') {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    }
     localStorage.setItem('theme', theme);
-    console.log('Theme applied:', theme, 'Classes:', root.classList.toString());
+    console.log('Theme applied:', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    console.log('toggleTheme called in ThemeProvider');
-    setTheme(prev => {
-      const newTheme = prev === 'light' ? 'dark' : 'light';
-      console.log('Changing theme from', prev, 'to', newTheme);
-      return newTheme;
-    });
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
   return (

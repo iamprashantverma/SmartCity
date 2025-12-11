@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaUserPlus } from "react-icons/fa";
 import { signUp } from "../service/api/authService";
+import { useTheme } from "../context/useTheme";
 import toast from "react-hot-toast";
 
 const SignUp = () => {
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -55,16 +57,24 @@ const SignUp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-8">
+    <div className={`min-h-screen flex items-center justify-center px-4 py-8 ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+        : 'bg-gradient-to-br from-green-50 to-blue-100'
+    }`}>
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <div className={`rounded-2xl shadow-xl p-8 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaUserPlus className="text-white text-2xl" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h2>
-            <p className="text-gray-600">Join Smart City and access all services</p>
+            <h2 className={`text-3xl font-bold mb-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-800'
+            }`}>Create Account</h2>
+            <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Join Smart City and access all services</p>
           </div>
 
           {/* Error Message */}
@@ -77,11 +87,15 @@ const SignUp = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Full Name *
               </label>
               <div className="relative">
-                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type="text"
                   id="name"
@@ -89,7 +103,11 @@ const SignUp = () => {
                   value={form.name}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                   minLength={2}
                   maxLength={50}
@@ -99,11 +117,15 @@ const SignUp = () => {
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Email Address *
               </label>
               <div className="relative">
-                <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FaEnvelope className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type="email"
                   id="email"
@@ -111,7 +133,11 @@ const SignUp = () => {
                   value={form.email}
                   onChange={handleInputChange}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                 />
               </div>
@@ -119,11 +145,15 @@ const SignUp = () => {
 
             {/* Phone Number */}
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="phoneNumber" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Phone Number *
               </label>
               <div className="relative">
-                <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FaPhone className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type="tel"
                   id="phoneNumber"
@@ -131,21 +161,31 @@ const SignUp = () => {
                   value={form.phoneNumber}
                   onChange={handleInputChange}
                   placeholder="+91 9876543210"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                   inputMode="numeric"
                 />
               </div>
-              <p className="text-xs text-gray-500 mt-1">Maximum 13 characters including country code</p>
+              <p className={`text-xs mt-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Maximum 13 characters including country code</p>
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Password *
               </label>
               <div className="relative">
-                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FaLock className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -153,7 +193,11 @@ const SignUp = () => {
                   value={form.password}
                   onChange={handleInputChange}
                   placeholder="Create a strong password"
-                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                   minLength={6}
                   maxLength={20}
@@ -161,12 +205,16 @@ const SignUp = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
+                    theme === 'dark' ? 'text-gray-400 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'
+                  }`}
                 >
                   {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">6-20 characters required</p>
+              <p className={`text-xs mt-1 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>6-20 characters required</p>
             </div>
 
             {/* Submit Button */}
@@ -191,7 +239,7 @@ const SignUp = () => {
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600">
+            <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
               Already have an account?{" "}
               <Link to="/login" className="text-green-600 hover:text-green-700 font-medium">
                 Sign in here
@@ -201,7 +249,9 @@ const SignUp = () => {
 
           {/* Terms */}
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
+            <p className={`text-xs ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               By creating an account, you agree to our{" "}
               <a href="#" className="text-green-600 hover:underline">Terms of Service</a>
               {" "}and{" "}

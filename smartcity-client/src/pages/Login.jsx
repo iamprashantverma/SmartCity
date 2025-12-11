@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useTheme } from "../context/useTheme";
 import { FaUser, FaLock, FaSignInAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -11,6 +12,7 @@ const Login = () => {
   });
   const [error, setError] = useState(""); 
   const { login } = useAuth();
+  const { theme } = useTheme();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -48,16 +50,24 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
+    <div className={`min-h-screen flex items-center justify-center px-4 ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+    }`}>
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <div className={`rounded-2xl shadow-xl p-8 ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        }`}>
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <FaUser className="text-white text-2xl" />
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Welcome Back</h2>
-            <p className="text-gray-600 dark:text-gray-300">Sign in to your Smart City account</p>
+            <h2 className={`text-3xl font-bold mb-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-800'
+            }`}>Welcome Back</h2>
+            <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>Sign in to your Smart City account</p>
           </div>
 
           {/* Error Message */}
@@ -70,11 +80,15 @@ const Login = () => {
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="email" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Email Address
               </label>
               <div className="relative">
-                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                <FaUser className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type="email"
                   id="email"
@@ -82,18 +96,26 @@ const Login = () => {
                   value={form.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className={`block text-sm font-medium mb-2 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Password
               </label>
               <div className="relative">
-                <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <FaLock className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                  theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <input
                   type="password"
                   id="password"
@@ -101,7 +123,11 @@ const Login = () => {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                      : 'border-gray-300 bg-white text-gray-900 placeholder-gray-500'
+                  }`}
                   required
                 />
               </div>
@@ -128,7 +154,7 @@ const Login = () => {
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <p className="text-gray-600">
+            <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
               Don't have an account?{" "}
               <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
                 Sign up here
@@ -137,9 +163,15 @@ const Login = () => {
           </div>
 
           {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h4>
-            <div className="text-xs text-gray-600 space-y-1">
+          <div className={`mt-6 p-4 rounded-lg ${
+            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
+          }`}>
+            <h4 className={`text-sm font-medium mb-2 ${
+              theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+            }`}>Demo Credentials:</h4>
+            <div className={`text-xs space-y-1 ${
+              theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               <p><strong>Admin:</strong> admin@smartcity.com / admin123</p>
               <p><strong>Citizen:</strong> citizen@smartcity.com / citizen123</p>
             </div>

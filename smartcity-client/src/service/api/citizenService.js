@@ -29,7 +29,13 @@ export const getContacts = () => api.get("/citizen/contacts");
 export const getContactById = (id) =>
   api.get(`/citizen/contacts/${id}`);
 
-export const getMyProfile = (userId) => { return api.get(`/citizen/profile`, {
-    params: { userId }
+export const getMyProfile = (userId) => {
+  return api.get(`/citizen/profile`, {
+    params: { userId },
   });
+};
+
+// Trigger email verification flow
+export const verifyEmailAddress = (userId) => {
+  return api.post(`/citizen/profile/verify-email`, { userId });
 };
