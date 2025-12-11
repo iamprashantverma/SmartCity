@@ -2,15 +2,13 @@ package com.smartcity.smartcityserver.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "contact")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class Contact {
 
     @Id
@@ -18,21 +16,18 @@ public class Contact {
     private Long id;
 
     @Column(nullable = false)
-    private String fullName;
+    private String name;
 
     @Column(nullable = false)
     private String email;
 
-    private String phone;
+    private String phoneNumber;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime submittedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        this.submittedAt = LocalDateTime.now();
-    }
 }

@@ -1,42 +1,45 @@
 package com.smartcity.smartcityserver.entity;
 
 
+import com.smartcity.smartcityserver.entity.enums.ComplaintStatus;
+import com.smartcity.smartcityserver.entity.enums.Priority;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "complaints")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class Complaint {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String complaintType;   // e.g., Garbage, Water, Electricity, Roads, Crime
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
+    private String complaintType;
+
+    @Column(nullable = false, length = 500)
     private String description;
 
+    private String attachmentUrl;
+
+    private String address;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String citizenName;
+    private ComplaintStatus status = ComplaintStatus.PENDING;
 
-    @Column(nullable = false)
-    private String citizenEmail;
+    @Enumerated(EnumType.STRING)
+    private Priority priority = Priority.NORMAL;
 
-    private String citizenPhone;
-
-
-
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-
-
-
+    private LocalDateTime updatedAt;
 }

@@ -34,3 +34,4 @@ build/
 .env
 src/test/
 src/main/resources/application-*.yml
+.idea/ 

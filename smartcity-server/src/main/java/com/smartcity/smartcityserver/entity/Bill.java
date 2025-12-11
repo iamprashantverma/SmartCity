@@ -16,10 +16,10 @@ public class Bill {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BillType billType;   // ELECTRICITY or PARKING
+    private BillType billType;
 
     @Column(nullable = false, length = 50)
-    private String consumerId;   // Meter number or vehicle number
+    private String consumerId;
 
     @Column(nullable = false)
     private Double amount;

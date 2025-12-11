@@ -23,7 +23,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.STUDENT;
+    private Role role = Role.CITIZEN;
 
     @Column(unique = true, nullable = false, length = 40)
     private String email;

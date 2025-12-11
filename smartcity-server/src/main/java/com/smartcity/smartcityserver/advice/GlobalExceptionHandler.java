@@ -20,11 +20,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(DuplicateActionException.class)
-    public ResponseEntity<APIResponse<?>> handleDuplicateActionException(DuplicateActionException ex) {
-        log.error("Duplication Action exception: {}", ex.getMessage());
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
+
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<APIResponse<?>> handleUserNotFound(UserNotFoundException ex) {
@@ -63,17 +59,6 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.GATEWAY_TIMEOUT, "Cloudinary network timeout or connectivity issue.");
     }
 
-    @ExceptionHandler(QuizTimeOverException.class)
-    public ResponseEntity<APIResponse<?>> handleQuizTimeOver(QuizTimeOverException ex) {
-        log.warn("Quiz time over: {}", ex.getMessage());
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    @ExceptionHandler(QuizNotFinishedException.class)
-    public ResponseEntity<APIResponse<?>> handleQuizNotFinished(QuizNotFinishedException ex) {
-        log.warn("Quiz not finished: {}", ex.getMessage());
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
 
 
 

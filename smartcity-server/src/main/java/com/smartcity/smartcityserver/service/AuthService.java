@@ -2,8 +2,7 @@ package com.smartcity.smartcityserver.service;
 
 import com.smartcity.smartcityserver.dto.LoginRequestDTO;
 import com.smartcity.smartcityserver.dto.LoginResponseDTO;
-import com.smartcity.smartcityserver.dto.UserCreateDTO;
-import com.smartcity.smartcityserver.dto.UserResponseDTO;
+import com.smartcity.smartcityserver.dto.UserDTO;
 import jakarta.validation.Valid;
 
 
@@ -23,5 +22,5 @@ public interface AuthService {
      * @param studentCreateDTO a validated DTO containing user registration details
      * @return UserResponseDTO containing the created user's information
      */
-    UserResponseDTO signUp(@Valid UserCreateDTO studentCreateDTO);
+    UserDTO signUp(@Valid UserDTO studentCreateDTO);
 }
