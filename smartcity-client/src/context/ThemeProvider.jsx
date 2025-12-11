@@ -16,10 +16,16 @@ const ThemeProvider = ({ children }) => {
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
+    console.log('Theme applied:', theme, 'Classes:', root.classList.toString());
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    console.log('toggleTheme called in ThemeProvider');
+    setTheme(prev => {
+      const newTheme = prev === 'light' ? 'dark' : 'light';
+      console.log('Changing theme from', prev, 'to', newTheme);
+      return newTheme;
+    });
   };
 
   return (
