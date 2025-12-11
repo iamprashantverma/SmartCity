@@ -35,4 +35,10 @@ public interface ContactService {
      * @param id ID of the contact message to delete
      */
     void deleteContact(Long id);
+
+    List<ContactDTO> getContactsByUserId(Long userId);
+
+    ContactDTO getContactByIdAndUserId(Long id, Long userId);
+
+    List<ContactDTO> getContacts();
 }

@@ -12,7 +12,6 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ComplaintServiceImpl implements ComplaintService {
-
     @Override
     public ComplaintDTO createComplaint(ComplaintDTO complaintDTO) {
         return null;
@@ -24,17 +23,12 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
     @Override
-    public ComplaintDTO getComplaintById(Long id) {
-        return null;
-    }
-
-    @Override
-    public List<ComplaintDTO> getAllComplaints() {
+    public List<ComplaintDTO> getComplaints() {
         return List.of();
     }
 
     @Override
-    public ComplaintDTO deleteComplaint(Long id) {
+    public ComplaintDTO getComplaintById(Long id) {
         return null;
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
+
     @Override
     public ContactDTO createContact(ContactDTO contactDTO) {
         return null;
@@ -32,5 +33,20 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public void deleteContact(Long id) {
 
+    }
+
+    @Override
+    public List<ContactDTO> getContactsByUserId(Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public ContactDTO getContactByIdAndUserId(Long id, Long userId) {
+        return null;
+    }
+
+    @Override
+    public List<ContactDTO> getContacts() {
+        return List.of();
     }
 }

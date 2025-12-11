@@ -1,46 +1,49 @@
 package com.smartcity.smartcityserver.service;
 
 import com.smartcity.smartcityserver.dto.ComplaintDTO;
+import jakarta.validation.Valid;
 import java.util.List;
 
 public interface ComplaintService {
 
     /**
-     * Creates a new complaint.
+     * Create a new complaint for the currently logged-in user.
      *
-     * @param complaintDTO DTO containing complaint details
-     * @return saved ComplaintDTO with generated ID and timestamps
+     * @param complaintDTO the complaint data to create
+     * @return the created complaint as a DTO
      */
-    ComplaintDTO createComplaint(ComplaintDTO complaintDTO);
+    ComplaintDTO createComplaint(@Valid ComplaintDTO complaintDTO);
 
     /**
-     * Updates an existing complaint.
+     * Update an existing complaint.
+     * <p>
+     * Citizens can update only their own complaints.
+     * Admins can update any complaint.
      *
-     * @param id ID of the complaint to update
-     * @param complaintDTO DTO with updated complaint details
-     * @return updated ComplaintDTO
+     * @param id           the ID of the complaint to update
+     * @param complaintDTO the updated complaint data
+     * @return the updated complaint as a DTO
      */
-    ComplaintDTO updateComplaint(Long id, ComplaintDTO complaintDTO);
+    ComplaintDTO updateComplaint(Long id, @Valid ComplaintDTO complaintDTO);
 
     /**
-     * Retrieves a complaint by ID.
+     * Retrieve all complaints visible to the currently logged-in user.
+     * <p>
+     * - Admin: returns all complaints.
+     * - Citizen: returns only their own complaints.
      *
-     * @param id complaint ID
-     * @return ComplaintDTO if found
+     * @return a list of complaint DTOs
+     */
+    List<ComplaintDTO> getComplaints();
+
+    /**
+     * Retrieve a specific complaint by ID.
+     * <p>
+     * - Admin: can access any complaint.
+     * - Citizen: can access only their own complaint.
+     *
+     * @param id the ID of the complaint to retrieve
+     * @return the complaint as a DTO
      */
     ComplaintDTO getComplaintById(Long id);
-
-    /**
-     * Retrieves all complaints.
-     *
-     * @return list of ComplaintDTO
-     */
-    List<ComplaintDTO> getAllComplaints();
-
-    /**
-     * Deletes a complaint by ID.
-     *
-     * @param id complaint ID
-     */
-    ComplaintDTO deleteComplaint(Long id);
 }
