@@ -56,4 +56,10 @@ public class User implements UserDetails {
     public String getUsername() {
         return this.email;
     }
+
+
+    public boolean hasRole(String roleName) {
+        return this.role.name().equalsIgnoreCase(roleName);
+    }
+
 }
