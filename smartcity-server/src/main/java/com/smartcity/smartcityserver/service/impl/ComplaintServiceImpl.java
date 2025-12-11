@@ -93,6 +93,21 @@ public class ComplaintServiceImpl implements ComplaintService {
         return modelMapper.map(complaint, ComplaintDTO.class);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ComplaintDTO checkComplaintStatus(Long id) {
+        User user = getCurrentUser();
+        Complaint complaint = complaintRepository.findById(id)
+                .orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with id: " + id));
+        if (!user.hasRole("ADMIN") && !complaint.getUser().getUserId().equals(user.getUserId())) {
+            log.warn("User {} attempted to check status of complaint {} without permission", user.getUserId(), id);
+            throw new AccessDeniedException("Access denied");
+        }
+        ComplaintDTO dto = modelMapper.map(complaint, ComplaintDTO.class);
+        log.info("Complaint status checked for id={} by user={}", id, user.getUserId());
+        return dto;
+    }
+
     // Helper to fetch currently logged-in user
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

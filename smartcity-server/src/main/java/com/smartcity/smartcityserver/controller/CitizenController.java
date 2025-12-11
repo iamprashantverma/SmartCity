@@ -25,6 +25,7 @@ public class CitizenController {
     private final ContactService contactService;
     private final UserService userService;
 
+
     // Create a complaint
     @PostMapping("/complaints")
     public ResponseEntity<ComplaintDTO> createComplaint(@Valid @RequestBody ComplaintDTO complaintDTO) {
@@ -51,6 +52,12 @@ public class CitizenController {
     public ResponseEntity<ComplaintDTO> getComplaintById(@PathVariable Long id) {
         ComplaintDTO complaint = complaintService.getComplaintById(id);
         return ResponseEntity.ok(complaint);
+    }
+    // check complain status
+    @GetMapping("/{id}/status")
+    public ResponseEntity<ComplaintDTO> getComplaintStatus(@PathVariable Long id) {
+        ComplaintDTO dto = complaintService.checkComplaintStatus(id);
+        return ResponseEntity.ok(dto);
     }
 
     // Submit a contact message
