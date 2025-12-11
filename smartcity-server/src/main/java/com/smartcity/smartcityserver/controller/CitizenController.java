@@ -53,12 +53,7 @@ public class CitizenController {
         ComplaintDTO complaint = complaintService.getComplaintById(id);
         return ResponseEntity.ok(complaint);
     }
-    // check complain status
-    @GetMapping("/{id}/status")
-    public ResponseEntity<ComplaintDTO> getComplaintStatus(@PathVariable Long id) {
-        ComplaintDTO dto = complaintService.checkComplaintStatus(id);
-        return ResponseEntity.ok(dto);
-    }
+
 
     // Submit a contact message
     @PostMapping("/contacts")
@@ -82,7 +77,7 @@ public class CitizenController {
     }
 
     // Get logged-in user's profile
-    @GetMapping("/me")
+    @GetMapping("/profile")
     public ResponseEntity<UserDTO> getMyProfile(@RequestParam Long userId) {
         UserDTO user = userService.getUserById(userId);
         return ResponseEntity.ok(user);

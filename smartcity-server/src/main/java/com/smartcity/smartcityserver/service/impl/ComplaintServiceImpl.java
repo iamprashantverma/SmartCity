@@ -5,6 +5,7 @@ import com.smartcity.smartcityserver.entity.Complaint;
 import com.smartcity.smartcityserver.entity.User;
 
 import com.smartcity.smartcityserver.exception.ComplaintNotFoundException;
+import com.smartcity.smartcityserver.exception.ResourceNotFoundException;
 import com.smartcity.smartcityserver.repositoriy.ComplaintRepository;
 import com.smartcity.smartcityserver.service.ComplaintService;
 import lombok.RequiredArgsConstructor;
@@ -94,18 +95,13 @@ public class ComplaintServiceImpl implements ComplaintService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public ComplaintDTO checkComplaintStatus(Long id) {
-        User user = getCurrentUser();
-        Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new ComplaintNotFoundException("Complaint not found with id: " + id));
-        if (!user.hasRole("ADMIN") && !complaint.getUser().getUserId().equals(user.getUserId())) {
-            log.warn("User {} attempted to check status of complaint {} without permission", user.getUserId(), id);
-            throw new AccessDeniedException("Access denied");
-        }
-        ComplaintDTO dto = modelMapper.map(complaint, ComplaintDTO.class);
-        log.info("Complaint status checked for id={} by user={}", id, user.getUserId());
-        return dto;
+    public ComplaintDTO changeComplaintStatus(Long id, ComplaintDTO complaintDTO) {
+        Complaint complaint = complaintRepository.findById(id).orElseThrow(()->
+                new ResourceNotFoundException("Invalid complain number:"+ id));
+        complaint.setStatus(complaintDTO.getStatus());
+        Complaint updatedComplaint = complaintRepository.save(complaint);
+
+        return modelMapper.map(updatedComplaint,ComplaintDTO.class);
     }
 
     // Helper to fetch currently logged-in user

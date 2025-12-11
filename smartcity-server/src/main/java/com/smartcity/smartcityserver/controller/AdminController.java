@@ -4,6 +4,7 @@ import com.smartcity.smartcityserver.dto.ComplaintDTO;
 import com.smartcity.smartcityserver.dto.ContactDTO;
 import com.smartcity.smartcityserver.service.ComplaintService;
 import com.smartcity.smartcityserver.service.ContactService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -47,4 +48,12 @@ public class AdminController {
         ContactDTO contact = contactService.getContactById(id);
         return ResponseEntity.ok(contact);
     }
+
+    // check complain status
+    @PatchMapping("/complaint/{id}")
+    public ResponseEntity<ComplaintDTO> changeComplaintStatus(@PathVariable Long id,@Valid @RequestBody ComplaintDTO complaintDTO) {
+        ComplaintDTO dto = complaintService.changeComplaintStatus(id,complaintDTO);
+        return ResponseEntity.ok(dto);
+    }
+
 }

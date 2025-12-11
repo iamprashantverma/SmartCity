@@ -47,5 +47,7 @@ public interface ComplaintService {
      */
     ComplaintDTO getComplaintById(Long id);
 
-    ComplaintDTO checkComplaintStatus(Long id);
+
+
+    ComplaintDTO changeComplaintStatus(Long id, ComplaintDTO complaintDTO);
 }
