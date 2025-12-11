@@ -32,14 +32,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public UserDTO signUp(UserDTO studentCreateDTO) {
+    public UserDTO signUp(UserDTO userDTO) {
         // Check if user already exists
-        userRepository.findByEmail(studentCreateDTO.getEmail())
+        userRepository.findByEmail(userDTO.getEmail())
                 .ifPresent(u -> {
-                    log.warn("Signup failed: email {} already exists", studentCreateDTO.getEmail());
-                    throw new UserAlreadyExistsException("Email already registered: " + studentCreateDTO.getEmail());
+                    log.warn("Signup failed: email {} already exists", userDTO.getEmail());
+                    throw new UserAlreadyExistsException("Email already registered: " + userDTO.getEmail());
                 });
-        User toBeCreated = convertToUserEntity(studentCreateDTO);
+        User toBeCreated = convertToUserEntity(userDTO);
 
         // hash the plain text and store in the DB
         String hashPassword =  passwordEncoder.encode(toBeCreated.getPassword());

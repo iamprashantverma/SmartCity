@@ -22,13 +22,12 @@ public class User implements UserDetails {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role = Role.CITIZEN;
 
     @Column(unique = true, nullable = false, length = 40)
     private String email;
 
-    @Column(nullable = false)
+
     private Boolean active = Boolean.TRUE;
 
     @Column(length = 13)
@@ -39,7 +38,6 @@ public class User implements UserDetails {
 
     private String profilePictureUrl;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean emailVerified = false;
 
     @Override
@@ -61,5 +59,13 @@ public class User implements UserDetails {
     public boolean hasRole(String roleName) {
         return this.role.name().equalsIgnoreCase(roleName);
     }
+
+    @PrePersist
+    public void prePersist() {
+        if (role == null) role = Role.CITIZEN;
+        if (active == null) active = Boolean.TRUE;
+        if (emailVerified == null) emailVerified = false;
+    }
+
 
 }

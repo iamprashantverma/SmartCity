@@ -2,8 +2,10 @@ package com.smartcity.smartcityserver.controller;
 
 import com.smartcity.smartcityserver.dto.ComplaintDTO;
 import com.smartcity.smartcityserver.dto.ContactDTO;
+import com.smartcity.smartcityserver.dto.UserDTO;
 import com.smartcity.smartcityserver.service.ComplaintService;
 import com.smartcity.smartcityserver.service.ContactService;
+import com.smartcity.smartcityserver.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ public class CitizenController {
 
     private final ComplaintService complaintService;
     private final ContactService contactService;
+    private final UserService userService;
 
     // Create a complaint
     @PostMapping("/complaints")
@@ -70,4 +73,12 @@ public class CitizenController {
         ContactDTO contact = contactService.getContactById(id);
         return ResponseEntity.ok(contact);
     }
+
+    // Get logged-in user's profile
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getMyProfile(@RequestParam Long userId) {
+        UserDTO user = userService.getUserById(userId);
+        return ResponseEntity.ok(user);
+    }
+
 }
