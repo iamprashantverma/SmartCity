@@ -29,7 +29,7 @@ const MyComplaints = ({ onUpdate }) => {
       setComplaints(normalized);
     } catch (error) {
       console.error('Error fetching complaints:', error);
-      toast.error('Failed to fetch complaints');
+      toast.error(error?.response?.data?.error?.message || 'Failed to fetch complaints');
     } finally {
       setLoading(false);
       setRefreshing(false);

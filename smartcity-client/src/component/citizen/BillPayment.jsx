@@ -1,349 +1,283 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTheme } from '../../context/useTheme';
-import { FaCreditCard, FaReceipt, FaCheckCircle } from 'react-icons/fa';
+import { useAuth } from '../../context/useAuth';
+import { fetchMyAllBills, payBillById } from '../../service/api/citizenService';
+import { FaReceipt, FaCheckCircle, FaFilter, FaSync } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const BillPayment = () => {
   const { theme } = useTheme();
-  const [selectedBill, setSelectedBill] = useState(null);
-  const [paymentForm, setPaymentForm] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: '',
-    amount: 0
-  });
-  const [loading, setLoading] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const { user } = useAuth();
+  const [bills, setBills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [payingBillId, setPayingBillId] = useState(null);
+  const [filterType, setFilterType] = useState('ALL');
+  const [filterPaid, setFilterPaid] = useState('ALL');
 
-  // Mock bill data
-  const bills = [
-    {
-      id: 1,
-      type: 'Electricity',
-      amount: 1250.00,
-      dueDate: '2024-01-15',
-      billNumber: 'ELE-2024-001',
-      status: 'pending',
-      icon: '⚡',
-      color: 'bg-yellow-100 border-yellow-300 text-yellow-800'
-    },
-    {
-      id: 2,
-      type: 'Water Supply',
-      amount: 850.00,
-      dueDate: '2024-01-20',
-      billNumber: 'WAT-2024-001',
-      status: 'pending',
-      icon: '💧',
-      color: 'bg-blue-100 border-blue-300 text-blue-800'
-    },
-    {
-      id: 3,
-      type: 'Property Tax',
-      amount: 5500.00,
-      dueDate: '2024-01-25',
-      billNumber: 'TAX-2024-001',
-      status: 'pending',
-      icon: '🏠',
-      color: 'bg-green-100 border-green-300 text-green-800'
-    },
-    {
-      id: 4,
-      type: 'Waste Management',
-      amount: 300.00,
-      dueDate: '2024-01-18',
-      billNumber: 'WST-2024-001',
-      status: 'pending',
-      icon: '🗑️',
-      color: 'bg-purple-100 border-purple-300 text-purple-800'
-    }
-  ];
+  const billTypes = {
+    ELECTRICITY: { label: 'Electricity', icon: '⚡', color: 'bg-yellow-100 border-yellow-300 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-700 dark:text-yellow-300' },
+    PARKING: { label: 'Parking', icon: '🚗', color: 'bg-blue-100 border-blue-300 text-blue-800 dark:bg-blue-900/20 dark:border-blue-700 dark:text-blue-300' },
+    WATER_SUPPLY: { label: 'Water Supply', icon: '💧', color: 'bg-cyan-100 border-cyan-300 text-cyan-800 dark:bg-cyan-900/20 dark:border-cyan-700 dark:text-cyan-300' },
+    WASTE_MANAGEMENT: { label: 'Waste Management', icon: '🗑️', color: 'bg-purple-100 border-purple-300 text-purple-800 dark:bg-purple-900/20 dark:border-purple-700 dark:text-purple-300' }
+  };
 
-  const handlePayment = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  useEffect(() => {
+    fetchBills();
+  }, []);
 
+  const fetchBills = async (withLoader = true) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful payment
-      setPaymentSuccess(true);
-      toast.success('Payment processed successfully!');
-      
-      // Reset form after success
-      setTimeout(() => {
-        setSelectedBill(null);
-        setPaymentForm({
-          cardNumber: '',
-          expiryDate: '',
-          cvv: '',
-          cardholderName: '',
-          amount: 0
-        });
-        setPaymentSuccess(false);
-      }, 3000);
-      
+      withLoader ? setLoading(true) : setRefreshing(true);
+      const response = await fetchMyAllBills();
+      const billsData = response?.data?.data || response?.data || [];
+      setBills(Array.isArray(billsData) ? billsData : []);
     } catch (error) {
-      toast.error('Payment failed. Please try again.');
+      console.error('Error fetching bills:', error);
+      toast.error(error?.response?.data?.error?.message || 'Failed to fetch bills');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Format card number
-    if (name === 'cardNumber') {
-      const formatted = value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
-      if (formatted.length <= 19) {
-        setPaymentForm(prev => ({ ...prev, [name]: formatted }));
-      }
-      return;
+  const handlePayBill = async (billId) => {
+    try {
+      setPayingBillId(billId);
+      await payBillById(billId);
+      toast.success('Bill paid successfully!');
+      await fetchBills(false);
+    } catch (error) {
+      console.error('Error paying bill:', error);
+      toast.error(error?.response?.data?.error?.message || 'Failed to pay bill');
+    } finally {
+      setPayingBillId(null);
     }
-    
-    // Format expiry date
-    if (name === 'expiryDate') {
-      const formatted = value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
-      if (formatted.length <= 5) {
-        setPaymentForm(prev => ({ ...prev, [name]: formatted }));
-      }
-      return;
-    }
-    
-    // Limit CVV to 3 digits
-    if (name === 'cvv') {
-      const formatted = value.replace(/\D/g, '');
-      if (formatted.length <= 3) {
-        setPaymentForm(prev => ({ ...prev, [name]: formatted }));
-      }
-      return;
-    }
-    
-    setPaymentForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const selectBill = (bill) => {
-    setSelectedBill(bill);
-    setPaymentForm(prev => ({ ...prev, amount: bill.amount }));
+  const filteredBills = useMemo(() => {
+    return bills.filter(bill => {
+      const matchesType = filterType === 'ALL' || bill.billType === filterType;
+      const matchesPaid = filterPaid === 'ALL' || 
+        (filterPaid === 'PAID' && bill.paid === true) ||
+        (filterPaid === 'UNPAID' && (bill.paid === false || bill.paid === null));
+      return matchesType && matchesPaid;
+    });
+  }, [bills, filterType, filterPaid]);
+
+  const stats = useMemo(() => {
+    const total = bills.length;
+    const paid = bills.filter(b => b.paid === true).length;
+    const unpaid = bills.filter(b => b.paid === false || b.paid === null).length;
+    const totalAmount = bills.reduce((sum, b) => sum + (b.amount || 0), 0);
+    const unpaidAmount = bills
+      .filter(b => b.paid === false || b.paid === null)
+      .reduce((sum, b) => sum + (b.amount || 0), 0);
+    return { total, paid, unpaid, totalAmount, unpaidAmount };
+  }, [bills]);
+
+  const getBillTypeInfo = (type) => {
+    return billTypes[type] || { label: type, icon: '📄', color: 'bg-gray-100 border-gray-300 text-gray-800 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200' };
   };
 
-  if (paymentSuccess) {
+  if (loading) {
     return (
-      <div className={`rounded-xl shadow-lg p-8 text-center ${
-        theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-      }`}>
-        <FaCheckCircle className="mx-auto text-6xl text-green-600 mb-4" />
-        <h2 className={`text-2xl font-bold mb-2 ${
-          theme === 'dark' ? 'text-white' : 'text-gray-800'
-        }`}>Payment Successful!</h2>
-        <p className={`mb-4 ${
-          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-        }`}>
-          Your payment of ₹{selectedBill?.amount.toFixed(2)} for {selectedBill?.type} has been processed.
-        </p>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-          <p className="text-sm text-green-700">
-            <strong>Transaction ID:</strong> TXN{Date.now()}
-          </p>
-          <p className="text-sm text-green-700">
-            <strong>Bill Number:</strong> {selectedBill?.billNumber}
-          </p>
-        </div>
-        <p className={`text-sm ${
-          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-        }`}>Redirecting to bills overview...</p>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {!selectedBill ? (
-        // Bills Overview
-        <div className={`rounded-xl shadow-lg p-6 ${
-          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-        }`}>
-          <div className="flex items-center gap-3 mb-6">
-            <FaReceipt className="text-2xl text-blue-600" />
-            <h2 className={`text-2xl font-bold ${
-              theme === 'dark' ? 'text-white' : 'text-gray-800'
-            }`}>Utility Bills</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {bills.map((bill) => (
-              <div key={bill.id} className={`border-2 rounded-xl p-6 hover:shadow-md transition-shadow ${bill.color}`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{bill.icon}</span>
-                    <div>
-                      <h3 className="font-bold text-lg">{bill.type}</h3>
-                      <p className="text-sm opacity-75">Bill #{bill.billNumber}</p>
-                    </div>
-                  </div>
-                  <span className="bg-white px-2 py-1 rounded-full text-xs font-medium">
-                    {bill.status.toUpperCase()}
-                  </span>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm opacity-75">Amount:</span>
-                    <span className="font-bold text-lg">₹{bill.amount.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm opacity-75">Due Date:</span>
-                    <span className="font-medium">{new Date(bill.dueDate).toLocaleDateString()}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => selectBill(bill)}
-                  className="w-full bg-white hover:bg-gray-50 text-gray-800 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors"
-                >
-                  Pay Now
-                </button>
-              </div>
-            ))}
-          </div>
+    <div className={`rounded-2xl shadow-xl p-6 space-y-6 ${
+      theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+    }`}>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Utility Bills</p>
+          <h2 className="text-2xl font-bold">My Bills</h2>
         </div>
-      ) : (
-        // Payment Form
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <FaCreditCard className="text-2xl text-blue-600" />
-              <h2 className="text-2xl font-bold text-gray-800">Payment Details</h2>
-            </div>
-            <button
-              onClick={() => setSelectedBill(null)}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+        <button
+          onClick={() => fetchBills(false)}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm hover:bg-green-50 dark:border-gray-700 dark:hover:bg-gray-800 transition"
+        >
+          <FaSync className={refreshing ? 'animate-spin' : ''} />
+          Refresh
+        </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className={`rounded-xl border p-4 text-center ${
+          theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Total</p>
+          <p className="text-2xl font-bold">{stats.total}</p>
+        </div>
+        <div className={`rounded-xl border p-4 text-center ${
+          theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Paid</p>
+          <p className="text-2xl font-bold text-green-600">{stats.paid}</p>
+        </div>
+        <div className={`rounded-xl border p-4 text-center ${
+          theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Unpaid</p>
+          <p className="text-2xl font-bold text-red-600">{stats.unpaid}</p>
+        </div>
+        <div className={`rounded-xl border p-4 text-center ${
+          theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+        }`}>
+          <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Due</p>
+          <p className="text-lg font-bold">₹{stats.unpaidAmount.toFixed(2)}</p>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className={`pl-10 pr-8 py-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none ${
+              theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'
+            }`}
+          >
+            <option value="ALL">All Bill Types</option>
+            {Object.keys(billTypes).map(type => (
+              <option key={type} value={type}>{billTypes[type].label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="relative flex-1">
+          <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <select
+            value={filterPaid}
+            onChange={(e) => setFilterPaid(e.target.value)}
+            className={`pl-10 pr-8 py-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none ${
+              theme === 'dark' ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'
+            }`}
+          >
+            <option value="ALL">All Bills</option>
+            <option value="PAID">Paid Bills</option>
+            <option value="UNPAID">Unpaid Bills</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Bills Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredBills.map((bill) => {
+          const typeInfo = getBillTypeInfo(bill.billType);
+          const isPaid = bill.paid === true;
+          
+          return (
+            <div
+              key={bill.billId}
+              className={`border-2 rounded-xl p-6 hover:shadow-lg transition-all ${
+                isPaid 
+                  ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700'
+                  : typeInfo.color
+              }`}
             >
-              ×
-            </button>
-          </div>
-
-          {/* Bill Summary */}
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-800 mb-2">Bill Summary</h3>
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{selectedBill.type}</p>
-                <p className="text-sm text-gray-600">Bill #{selectedBill.billNumber}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-gray-800">₹{selectedBill.amount.toFixed(2)}</p>
-                <p className="text-sm text-gray-600">Due: {new Date(selectedBill.dueDate).toLocaleDateString()}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Form */}
-          <form onSubmit={handlePayment} className="space-y-6">
-            <div>
-              <label htmlFor="cardholderName" className="block text-sm font-medium text-gray-700 mb-2">
-                Cardholder Name *
-              </label>
-              <input
-                type="text"
-                id="cardholderName"
-                name="cardholderName"
-                value={paymentForm.cardholderName}
-                onChange={handleInputChange}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                Card Number *
-              </label>
-              <input
-                type="text"
-                id="cardNumber"
-                name="cardNumber"
-                value={paymentForm.cardNumber}
-                onChange={handleInputChange}
-                placeholder="1234 5678 9012 3456"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 mb-2">
-                  Expiry Date *
-                </label>
-                <input
-                  type="text"
-                  id="expiryDate"
-                  name="expiryDate"
-                  value={paymentForm.expiryDate}
-                  onChange={handleInputChange}
-                  placeholder="MM/YY"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{typeInfo.icon}</span>
+                  <div>
+                    <h3 className={`font-bold text-lg ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>{typeInfo.label}</h3>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>Bill #{bill.billId}</p>
+                  </div>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  isPaid
+                    ? 'bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200'
+                    : 'bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200'
+                }`}>
+                  {isPaid ? 'PAID' : 'UNPAID'}
+                </span>
               </div>
 
-              <div>
-                <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 mb-2">
-                  CVV *
-                </label>
-                <input
-                  type="text"
-                  id="cvv"
-                  name="cvv"
-                  value={paymentForm.cvv}
-                  onChange={handleInputChange}
-                  placeholder="123"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <FaCreditCard />
-                    Pay ₹{selectedBill.amount.toFixed(2)}
-                  </>
+              <div className="space-y-2 mb-4">
+                <div className="flex justify-between">
+                  <span className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                  }`}>Amount:</span>
+                  <span className={`font-bold text-lg ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>₹{bill.amount?.toFixed(2) || '0.00'}</span>
+                </div>
+                {bill.createdAt && (
+                  <div className="flex justify-between">
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>Created:</span>
+                    <span className={`font-medium ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      {new Date(bill.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
                 )}
-              </button>
+                {bill.paidAt && (
+                  <div className="flex justify-between">
+                    <span className={`text-sm ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                    }`}>Paid On:</span>
+                    <span className={`font-medium ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
+                      {new Date(bill.paidAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedBill(null)}
-                className="px-6 py-3 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
-              >
-                Cancel
-              </button>
+              {!isPaid && (
+                <button
+                  onClick={() => handlePayBill(bill.billId)}
+                  disabled={payingBillId === bill.billId}
+                  className={`w-full font-medium py-2 px-4 rounded-lg transition-colors ${
+                    payingBillId === bill.billId
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  {payingBillId === bill.billId ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Processing...
+                    </span>
+                  ) : (
+                    'Pay Now'
+                  )}
+                </button>
+              )}
+              {isPaid && (
+                <div className="w-full bg-green-200 text-green-800 dark:bg-green-800 dark:text-green-200 font-medium py-2 px-4 rounded-lg text-center">
+                  <FaCheckCircle className="inline mr-2" />
+                  Paid
+                </div>
+              )}
             </div>
-          </form>
+          );
+        })}
+      </div>
 
-          {/* Security Notice */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-            <p className="text-sm text-blue-700">
-              🔒 Your payment information is secure and encrypted. This is a demo - no actual payment will be processed.
-            </p>
-          </div>
+      {filteredBills.length === 0 && (
+        <div className="text-center py-12">
+          <FaReceipt className={`mx-auto text-4xl mb-4 ${
+            theme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+          }`} />
+          <p className={`text-lg ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>No bills found</p>
         </div>
       )}
     </div>

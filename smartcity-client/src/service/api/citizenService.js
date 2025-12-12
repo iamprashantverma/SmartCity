@@ -39,3 +39,19 @@ export const getMyProfile = (userId) => {
 export const verifyEmailAddress = (userId) => {
   return api.post(`/citizen/profile/verify-email`, { userId });
 };
+
+
+// Get bill by ID
+export const getBillById = (id) => {
+  return api.get(`/citizen/bills/${id}`);
+};
+
+// Fetch all bills for citizen
+export const fetchMyAllBills = () => {
+  return api.get("/citizen/bills");
+};
+
+// Pay a bill (mark as paid)
+export const payBillById = (id) => {
+  return api.put(`/citizen/bills/${id}`);
+};

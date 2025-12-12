@@ -13,7 +13,9 @@ import CreateComplaint from './component/citizen/CreateComplaint';
 import BillPayment from './component/citizen/BillPayment';
 import ContactUs from './component/citizen/ContactUs';
 import Profile from './component/citizen/Profile';
+import CreateBill from './component/Admin/CreateBill';
 import { useAuth } from './context/useAuth';
+import { useTheme } from './context/useTheme';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -49,6 +51,8 @@ const PublicRoute = ({ children }) => {
 };
 
 function App() {
+  const { theme } = useTheme();
+  
   return (
     <>
       <NavBar/>
@@ -73,7 +77,11 @@ function App() {
         } />
         <Route path='/admin/complaints' element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <ComplaintsList />
               </div>
@@ -82,7 +90,11 @@ function App() {
         } />
         <Route path='/admin/contacts' element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <ContactsList />
               </div>
@@ -91,9 +103,26 @@ function App() {
         } />
         <Route path='/admin/profile' element={
           <ProtectedRoute allowedRoles={['ADMIN']}>
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <Profile />
+              </div>
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path='/admin/bills/create' element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+            }`}>
+              <div className="container mx-auto px-4 py-8">
+                <CreateBill />
               </div>
             </div>
           </ProtectedRoute>
@@ -107,7 +136,11 @@ function App() {
         } />
         <Route path='/citizen/complaints' element={
           <ProtectedRoute allowedRoles={['CITIZEN']}>
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-green-50 to-blue-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <MyComplaints />
               </div>
@@ -116,7 +149,11 @@ function App() {
         } />
         <Route path='/citizen/complaints/create' element={
           <ProtectedRoute allowedRoles={['CITIZEN']}>
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-green-50 to-blue-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <CreateComplaint />
               </div>
@@ -125,7 +162,11 @@ function App() {
         } />
         <Route path='/citizen/bills' element={
           <ProtectedRoute allowedRoles={['CITIZEN']}>
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-green-50 to-blue-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <BillPayment />
               </div>
@@ -134,7 +175,11 @@ function App() {
         } />
         <Route path='/citizen/contact' element={
           <ProtectedRoute allowedRoles={['CITIZEN']}>
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-green-50 to-blue-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <ContactUs />
               </div>
@@ -143,7 +188,11 @@ function App() {
         } />
         <Route path='/citizen/profile' element={
           <ProtectedRoute allowedRoles={['CITIZEN']}>
-            <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100">
+            <div className={`min-h-screen ${
+              theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+                : 'bg-gradient-to-br from-green-50 to-blue-100'
+            }`}>
               <div className="container mx-auto px-4 py-8">
                 <Profile />
               </div>

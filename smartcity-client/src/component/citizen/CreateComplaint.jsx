@@ -51,7 +51,7 @@ const CreateComplaint = ({ onSuccess }) => {
       onSuccess && onSuccess();
     } catch (error) {
       console.error('Error creating complaint:', error);
-      toast.error(error.response?.data?.message || 'Failed to file complaint');
+      toast.error(error?.response?.data?.error?.message || 'Failed to file complaint');
     } finally {
       setLoading(false);
     }

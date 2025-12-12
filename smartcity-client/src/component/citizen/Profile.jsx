@@ -60,7 +60,7 @@ const Profile = () => {
     } catch (error) {
       console.error('Error sending verification email:', error);
       const message =
-        error?.response?.data?.message || 'Failed to send verification email';
+        error?.response?.data?.error?.message || 'Failed to send verification email';
       setActionMessage(message);
       toast.error(message);
     } finally {

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/useTheme';
 import { getAllComplaints, getAllContacts } from '../../service/api/adminService';
-import { FaUsers, FaExclamationTriangle, FaEnvelope, FaChartBar } from 'react-icons/fa';
+import { FaUsers, FaExclamationTriangle, FaEnvelope, FaChartBar, FaReceipt } from 'react-icons/fa';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -159,6 +159,24 @@ const AdminDashboard = () => {
                     <p className={`text-sm ${
                       theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                     }`}>Check citizen contact messages</p>
+                  </div>
+                </Link>
+                <Link
+                  to="/admin/bills/create"
+                  className={`flex items-center gap-3 p-4 rounded-lg border transition-colors ${
+                    theme === 'dark' 
+                      ? 'bg-green-900/20 hover:bg-green-900/30 border-green-800' 
+                      : 'bg-green-50 hover:bg-green-100 border-green-200'
+                  }`}
+                >
+                  <FaReceipt className="text-green-600 text-xl" />
+                  <div className="text-left">
+                    <p className={`font-semibold ${
+                      theme === 'dark' ? 'text-green-300' : 'text-green-800'
+                    }`}>Create Bill</p>
+                    <p className={`text-sm ${
+                      theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                    }`}>Generate new utility bills</p>
                   </div>
                 </Link>
               </div>

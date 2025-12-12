@@ -31,7 +31,7 @@ const ComplaintsList = ({ onUpdate }) => {
       setComplaints(normalized);
     } catch (error) {
       console.error('Error fetching complaints:', error);
-      toast.error('Failed to fetch complaints');
+      toast.error(error?.response?.data?.error?.message || 'Failed to fetch complaints');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -68,7 +68,7 @@ const ComplaintsList = ({ onUpdate }) => {
       onUpdate && onUpdate();
     } catch (error) {
       console.error('Error updating complaint:', error);
-      const message = error?.response?.data?.message || 'Failed to update complaint status';
+      const message = error?.response?.data?.error?.message || 'Failed to update complaint status';
       setLastMessage(message);
       toast.error(message);
     } finally {

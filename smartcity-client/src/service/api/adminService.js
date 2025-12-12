@@ -30,3 +30,13 @@ export const getAllContacts = () => {
 export const getContactById = (id) => {
   return api.get(`/admin/contacts/${id}`);
 };
+
+// create Bill for User
+export const  createBill= (data)=>{
+  return api.post(`/admin/bills`,data);
+}
+// fetch all Bills
+export const fetchAllBills = ()=>{
+  return api.get("/admin/bills");
+}
+
