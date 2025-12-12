@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/useTheme';
-import { getMyProfile, verifyEmailAddress } from '../../service/api/citizenService';
-import { FaEnvelope, FaUser, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
-import toast from 'react-hot-toast';
+import { getMyProfile } from '../../service/api/citizenService';
+import { FaUser } from 'react-icons/fa';
 
 const Profile = () => {
   const { user } = useAuth();
   const { theme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [verifyingEmail, setVerifyingEmail] = useState(false);
-  const [actionMessage, setActionMessage] = useState('');
 
   useEffect(() => {
     if (user?.id) {
@@ -33,7 +30,6 @@ const Profile = () => {
         email: user?.email || '',
         phoneNumber: '',
         profilePictureUrl: '',
-        emailVerified: user?.emailVerified || false,
         active: user?.active ?? true,
       });
     } finally {
@@ -41,32 +37,6 @@ const Profile = () => {
     }
   };
 
-  const handleVerifyEmail = async () => {
-    if (!user?.id) return;
-    try {
-      setVerifyingEmail(true);
-      const response = await verifyEmailAddress(user.id);
-      const updatedProfile = response?.data?.data;
-      const message =
-        response?.data?.message || 'Verification email sent! Please check your inbox.';
-
-      setProfile((prev) => ({
-        ...prev,
-        ...(updatedProfile || {}),
-        emailVerified: updatedProfile?.emailVerified ?? true,
-      }));
-      setActionMessage(message);
-      toast.success(message);
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-      const message =
-        error?.response?.data?.error?.message || 'Failed to send verification email';
-      setActionMessage(message);
-      toast.error(message);
-    } finally {
-      setVerifyingEmail(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -92,11 +62,6 @@ const Profile = () => {
             <h2 className="text-2xl font-bold">My Profile</h2>
           </div>
         </div>
-        {actionMessage && (
-          <span className="text-xs px-3 py-2 rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200">
-            {actionMessage}
-          </span>
-        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -137,55 +102,6 @@ const Profile = () => {
                   <strong>Account Status:</strong> {profile?.active ? 'Active' : 'Inactive'}
                 </p>
               </div>
-
-              <div
-                className={`p-3 rounded-lg ${
-                  profile?.emailVerified
-                    ? theme === 'dark'
-                      ? 'bg-blue-900/20 border border-blue-800'
-                      : 'bg-blue-50'
-                    : theme === 'dark'
-                      ? 'bg-red-900/20 border border-red-800'
-                      : 'bg-red-50'
-                }`}
-              >
-                <p
-                  className={`text-sm ${
-                    profile?.emailVerified
-                      ? theme === 'dark'
-                        ? 'text-blue-300'
-                        : 'text-blue-700'
-                      : theme === 'dark'
-                        ? 'text-red-300'
-                        : 'text-red-700'
-                  }`}
-                >
-                  <strong>Email Status:</strong>{' '}
-                  {profile?.emailVerified ? 'Verified' : 'Not Verified'}
-                </p>
-
-                {!profile?.emailVerified && (
-                  <div className="mt-3">
-                    <button
-                      onClick={handleVerifyEmail}
-                      disabled={verifyingEmail}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm w-full justify-center"
-                    >
-                      {verifyingEmail ? (
-                        <>
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <FaEnvelope />
-                          Verify Email
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
         </div>
@@ -201,13 +117,6 @@ const Profile = () => {
               <InfoField
                 label="Email Address"
                 value={profile?.email || 'Not provided'}
-                extra={
-                  profile?.emailVerified ? (
-                    <Badge icon={FaCheckCircle} color="text-green-600" text="Verified" />
-                  ) : (
-                    <Badge icon={FaExclamationTriangle} color="text-red-600" text="Not verified" />
-                  )
-                }
               />
               <InfoField label="Phone Number" value={profile?.phoneNumber || 'Not provided'} />
               <InfoField
@@ -225,7 +134,7 @@ const Profile = () => {
   );
 };
 
-const InfoField = ({ label, value, extra, isLong = false }) => (
+const InfoField = ({ label, value, isLong = false }) => (
   <div className="space-y-1">
     <label className="block text-sm font-medium text-gray-600 dark:text-gray-300">{label}</label>
     <div className="flex items-start gap-2">
@@ -236,16 +145,9 @@ const InfoField = ({ label, value, extra, isLong = false }) => (
       >
         {value}
       </p>
-      {extra}
     </div>
   </div>
 );
 
-const Badge = ({ icon: Icon, color, text }) => (
-  <span className={`inline-flex items-center gap-1 text-xs font-semibold ${color}`}>
-    <Icon />
-    {text}
-  </span>
-);
 
 export default Profile;

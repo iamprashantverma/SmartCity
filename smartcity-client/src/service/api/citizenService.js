@@ -1,7 +1,5 @@
 import api from "./api";
 
-// ===== Complaints =====
-
 // Create a complaint
 export const createComplaint = (data) => api.post("/citizen/complaints", data);
 

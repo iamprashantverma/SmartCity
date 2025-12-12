@@ -13,6 +13,7 @@ import CreateComplaint from './component/citizen/CreateComplaint';
 import BillPayment from './component/citizen/BillPayment';
 import ContactUs from './component/citizen/ContactUs';
 import Profile from './component/citizen/Profile';
+import AboutUs from './component/citizen/AboutUs';
 import CreateBill from './component/Admin/CreateBill';
 import { useAuth } from './context/useAuth';
 import { useTheme } from './context/useTheme';
@@ -58,6 +59,17 @@ function App() {
       <NavBar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
+        <Route path='/about' element={
+          <div className={`min-h-screen ${
+            theme === 'dark' 
+              ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+              : 'bg-gradient-to-br from-green-50 to-blue-100'
+          }`}>
+            <div className="container mx-auto px-4 py-8">
+              <AboutUs />
+            </div>
+          </div>
+        } />
         <Route path='/signup' element={
           <PublicRoute>
             <SignUp/>
