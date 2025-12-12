@@ -104,4 +104,6 @@ public class CitizenController {
         return ResponseEntity.ok(allBills);
     }
 
+
+
 }

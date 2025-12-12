@@ -3,25 +3,9 @@ spring:
     name: SmartCityServer
   profiles:
     active: dev
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${USER_NAME}
-    password: ${PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-          ssl:
-            trust: smtp.gmail.com
+
 jwt:
   secretKey: ${JWT_SECRET}
 
-cloudinary:
-  cloud-name: ${CLOUD_NAME}
-  api-key: ${API_KEY}
-  api-secret: ${API_SECRET}
 
 frontend-url: ${FRONTEND_URL}
