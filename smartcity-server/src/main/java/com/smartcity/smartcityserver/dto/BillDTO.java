@@ -14,9 +14,9 @@ public class BillDTO {
     @NotNull(message = "Bill type is required")
     private BillType billType;
 
-    @NotBlank(message = "Consumer ID is required")
-    @Size(max = 50, message = "Consumer ID cannot exceed 50 characters")
-    private String consumerId;
+
+    @NotNull(message = "Please Enter User Id")
+    private Long userId;
 
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be greater than zero")

@@ -2,12 +2,18 @@ package com.smartcity.smartcityserver.service.impl;
 
 import com.smartcity.smartcityserver.dto.BillDTO;
 import com.smartcity.smartcityserver.entity.Bill;
+import com.smartcity.smartcityserver.entity.User;
 import com.smartcity.smartcityserver.exception.BillNotFoundException;
+import com.smartcity.smartcityserver.exception.ResourceNotFoundException;
+import com.smartcity.smartcityserver.exception.UserNotFoundException;
 import com.smartcity.smartcityserver.repositoriy.BillRepository;
+import com.smartcity.smartcityserver.repositoriy.UserRepository;
 import com.smartcity.smartcityserver.service.BillService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +28,15 @@ public class BillServiceImpl implements BillService {
 
     private final BillRepository billRepository;
     private final ModelMapper modelMapper;
+    private final UserRepository userRepository;
 
     @Override
     public BillDTO createBill(BillDTO billDTO) {
         Bill bill = modelMapper.map(billDTO, Bill.class);
         Bill saved = billRepository.save(bill);
+        User user = userRepository.findById(billDTO.getUserId()).orElseThrow(()->
+                new ResourceNotFoundException("Invalid UserId :" + billDTO.getUserId()));
+
         log.info("Bill created with id={}", saved.getBillId());
         return modelMapper.map(saved, BillDTO.class);
     }
@@ -38,7 +48,7 @@ public class BillServiceImpl implements BillService {
 
         bill.setBillType(billDTO.getBillType());
         bill.setAmount(billDTO.getAmount());
-        bill.setConsumerId(billDTO.getConsumerId());
+        bill.setUserId(billDTO.getUserId());
         bill.setPaid(billDTO.getPaid());
 
         if (billDTO.getPaid() != null && billDTO.getPaid() && bill.getPaidAt() == null) {
@@ -52,9 +62,15 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<BillDTO> getAllBills() {
-        List<Bill> bills = billRepository.findAll();
-        log.info("Fetched all bills, count={}", bills.size());
-        return bills.stream()
+        User user = getCurrentUser();
+        List<Bill>allBills;
+        if (user.hasRole("ADMIN")) {
+            allBills = billRepository.findAll();
+        } else {
+            allBills = billRepository.findAllByUserId(user.getUserId());
+        }
+        log.info("Fetched all bills, count={}", allBills.size());
+        return allBills.stream()
                 .map(b -> modelMapper.map(b, BillDTO.class))
                 .toList();
     }
@@ -78,5 +94,11 @@ public class BillServiceImpl implements BillService {
             billRepository.save(bill);
             log.info("Bill marked as paid with id={}", billId);
         }
+    }
+
+    // Helper to fetch currently logged-in user
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }

@@ -1,8 +1,10 @@
 package com.smartcity.smartcityserver.controller;
 
+import com.smartcity.smartcityserver.dto.BillDTO;
 import com.smartcity.smartcityserver.dto.ComplaintDTO;
 import com.smartcity.smartcityserver.dto.ContactDTO;
 import com.smartcity.smartcityserver.dto.UserDTO;
+import com.smartcity.smartcityserver.service.BillService;
 import com.smartcity.smartcityserver.service.ComplaintService;
 import com.smartcity.smartcityserver.service.ContactService;
 import com.smartcity.smartcityserver.service.UserService;
@@ -24,6 +26,7 @@ public class CitizenController {
     private final ComplaintService complaintService;
     private final ContactService contactService;
     private final UserService userService;
+    private final BillService billService;
 
 
     // Create a complaint
@@ -81,6 +84,24 @@ public class CitizenController {
     public ResponseEntity<UserDTO> getMyProfile(@RequestParam Long userId) {
         UserDTO user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/bills/{id}")
+    public ResponseEntity<BillDTO> getBIllById(@PathVariable Long id){
+        BillDTO billDTO = billService.getBillById(id);
+        return ResponseEntity.ok(billDTO);
+    }
+
+    @PutMapping("/bills/{id}")
+    public ResponseEntity<Void> markBillAsPaid(@PathVariable Long id) {
+        billService.markBillAsPaid(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/bills")
+    public ResponseEntity<List<BillDTO>> getAllBills(){
+        List<BillDTO> allBills = billService.getAllBills();
+        return ResponseEntity.ok(allBills);
     }
 
 }

@@ -18,8 +18,7 @@ public class Bill {
     @Column(nullable = false)
     private BillType billType;
 
-    @Column(nullable = false, length = 50)
-    private String consumerId;
+    private Long userId;
 
     @Column(nullable = false)
     private Double amount;
@@ -31,4 +30,12 @@ public class Bill {
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null)
+            createdAt = LocalDateTime.now();
+        if (paid == null)
+            paid = false;
+    }
 }

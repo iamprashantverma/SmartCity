@@ -1,7 +1,9 @@
 package com.smartcity.smartcityserver.controller;
 
+import com.smartcity.smartcityserver.dto.BillDTO;
 import com.smartcity.smartcityserver.dto.ComplaintDTO;
 import com.smartcity.smartcityserver.dto.ContactDTO;
+import com.smartcity.smartcityserver.service.BillService;
 import com.smartcity.smartcityserver.service.ComplaintService;
 import com.smartcity.smartcityserver.service.ContactService;
 import jakarta.validation.Valid;
@@ -20,7 +22,7 @@ public class AdminController {
 
     private final ComplaintService complaintService;
     private final ContactService contactService;
-
+    private final BillService billService;
     // Get all complaints
     @GetMapping("/complaints")
     public ResponseEntity<List<ComplaintDTO>> getAllComplaints() {
@@ -55,5 +57,19 @@ public class AdminController {
         ComplaintDTO dto = complaintService.changeComplaintStatus(id,complaintDTO);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/bills")
+    public ResponseEntity<BillDTO> createBill(@Valid @RequestBody BillDTO billDTO ) {
+        BillDTO savedBill = billService.createBill(billDTO);
+        return ResponseEntity.ok(savedBill);
+    }
+
+    @GetMapping("/bills")
+    public ResponseEntity<List<BillDTO>> getAllBills(){
+        List<BillDTO> allBills = billService.getAllBills();
+        return ResponseEntity.ok(allBills);
+    }
+
+
 
 }
